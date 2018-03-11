@@ -16,7 +16,6 @@ if args.spectra[-4:] == '.npy':
 else:
     spectra = np.loadtxt(args.spectra)
 filtr = np.loadtxt(args.filter)
-spectra = np.loadtxt(args.spectra)
 wavelength_mask = (spectra[:, 0] >= filtr[0, 0]) & (spectra[:, 0] <= filtr[-1, 0])
 spectra = spectra[wavelength_mask]
 
