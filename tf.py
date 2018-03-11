@@ -10,6 +10,11 @@ parser.add_argument('suffix', type=str, help='Output filename suffix.')
 args = parser.parse_args()
 
 # load everything and mask
+if args.spectra[-4:] == '.npy':
+    spectra = np.load(args.spectra)
+    args.spectra = args.spectra[:-4]
+else:
+    spectra = np.loadtxt(args.spectra)
 filtr = np.loadtxt(args.filter)
 spectra = np.loadtxt(args.spectra)
 wavelength_mask = (spectra[:, 0] >= filtr[0, 0]) & (spectra[:, 0] <= filtr[-1, 0])
@@ -25,4 +30,4 @@ spectra[:, 1] *= interpolated_filtr
 # transmitted_spectra = np.column_stack([spectra[:, 0], transmitted_intensity])
 
 # save data
-np.savetxt('spectra_{}'.format(args.suffix), spectra)
+np.save('spectra_{}'.format(args.suffix), spectra)
