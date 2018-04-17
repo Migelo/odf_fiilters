@@ -8,15 +8,18 @@ parser = argparse.ArgumentParser(description='Calculate errors.')
 parser.add_argument('suffix', type=str, nargs='+', help='Filename(s).')
 parser.add_argument('-nb', type=str, help='Number of bins.')
 parser.add_argument('--nproc', type=int, default=20, help='Number of cpus.')
+parser.add_argument('--outfile', type=str, default='results.txt',
+                    help='Output filename.')
 args = parser.parse_args()
 
 # load all files
-detailed_spectra = np.loadtxt('spectra_transmitted')
+detailed_spectra = np.load('spectra_transmitted.npy')
+
 
 def compare(filename):
     if args.nb == '2b':
         bins = np.loadtxt('bins_cut_1', ndmin=2)
-        odf_spectra = np.loadtxt('{}'.format(filename))
+        odf_spectra = np.load('{}'.format(filename))
         filtr = np.loadtxt('filtr_cut_1')
     elif args.nb == '2':
         bins = np.loadtxt('bins_{}'.format(args.suffix), ndmin=2)
@@ -63,13 +66,15 @@ def compare(filename):
     print('ODF / stretch_factor / detailed for {}: {}'
           .format(filename.split('/')[-1][15:],
                   odf_integral / stretch_factor / detailed_integral))
-    return('{} {}'.format(filename.split('/')[-1][15:],
+    return('{} {}\n'.format(filename[:-4].split('/')[-1][15:],
                           odf_integral / stretch_factor / detailed_integral))
 
 p = Pool(args.nproc)
 results = p.map(compare, args.suffix)
 
-f = open('results.txt', 'a')
+f = open(args.outfile, 'a+')
 for result in results:
-    f.write('{} {}\n'.format(filename, odf_integral / stretch_factor / detailed_integral))
+    # f.write('{} {}\n'.format(filename, odf_integral / stretch_factor /
+    # detailed_integral))
+    f.write(result)
 f.close()
